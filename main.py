@@ -71,7 +71,9 @@ logging.info('Flows=%d. HTTP pairs=%d' % (len(session.flows), len(session.entrie
 
 #write the HAR file
 with open(outputfile, 'w') as f:
+    f.write("onInputData(")
     json.dump(session, f, cls=har.JsonReprEncoder, indent=2, encoding='utf8', sort_keys=True)
+    f.write(");")
 
 if options.resource_usage:
     print_rusage()
