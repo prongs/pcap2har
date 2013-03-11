@@ -37,6 +37,8 @@ parser.add_option('--pad_missing_tcp_data', action='store_true',
 parser.add_option('--strict-http-parsing', action='store_true',
                   dest='strict_http_parsing', default=False)
 parser.add_option('-l', '--log', dest='logfile', default='pcap2har.log')
+parser.add_option('-j', '--jsonp', metavar="JSONP-FUNCTION-NAME",
+                  dest='jsonp_function_name', action='store')
 options, args = parser.parse_args()
 
 # copy options to settings module
@@ -71,9 +73,11 @@ logging.info('Flows=%d. HTTP pairs=%d' % (len(session.flows), len(session.entrie
 
 #write the HAR file
 with open(outputfile, 'w') as f:
-    f.write("onInputData(")
+    if options.jsonp_function_name:
+        f.write("%s(" % options.jsonp_function_name)
     json.dump(session, f, cls=har.JsonReprEncoder, indent=2, encoding='utf8', sort_keys=True)
-    f.write(");")
+    if options.jsonp_function_name:
+        f.write(");")
 
 if options.resource_usage:
     print_rusage()
